@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hinata-Sexy-Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --primary-light: #303f9f;
+            --primary-dark: #000051;
+            --secondary: #00b0ff;
+            --dark: #0a0a12;
+            --light: #e8f4ff;
+            --bot-bubble: #1e2a78;
+            --user-bubble: #283593;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--dark), #121a3a);
+            color: var(--light);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 100vh;
+            margin: 0 auto;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 14, 36, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--secondary);
+            flex-shrink: 0;
+        }
+
+        .chat-header img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+        }
+
+        .chat-header h2 {
+            font-size: 1.1rem;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: var(--bot-bubble);
+            border-top-left-radius: 5px;
+            margin-right: auto;
+            margin-left: 40px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            border-top-right-radius: 5px;
+            margin-left: auto;
+        }
+
+        .bot-icon {
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bot-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 8px 12px;
+            background: var(--bot-bubble);
+            border-radius: 18px;
+            width: fit-content;
+            align-items: center;
+            margin-left: 40px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--light);
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .chat-input {
+            display: flex;
+            padding: 12px;
+            background: var(--primary-dark);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 0.95rem;
+            outline: none;
+            min-width: 0;
+        }
+
+        #send-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        #send-btn i {
+            font-size: 0.9rem;
+        }
+
+        #send-btn:hover {
+            background: #0091ea;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+
+        /* Media Queries pour différents écrans */
+        @media (min-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                margin: 2vh auto;
+                border-radius: 15px;
+            }
+            
+            .chat-header {
+                padding: 15px 20px;
+            }
+            
+            .chat-header img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .chat-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .chat-messages {
+                padding: 20px;
+                gap: 15px;
+            }
+            
+            .message {
+                max-width: 80%;
+                padding: 12px 18px;
+                font-size: 1rem;
+            }
+            
+            .bot-icon {
+                left: -45px;
+                width: 35px;
+                height: 35px;
+            }
+            
+            .typing-indicator {
+                padding: 10px 15px;
+                margin-left: 45px;
+            }
+            
+            .typing-dot {
+                width: 8px;
+                height: 8px;
+                margin: 0 3px;
+            }
+            
+            .chat-input {
+                padding: 15px;
+            }
+            
+            #user-input {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+            
+            #send-btn {
+                width: 45px;
+                height: 45px;
+                margin-left: 10px;
+            }
+            
+            #send-btn i {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .chat-container {
+                max-width: 950px;
+            }
+        }
+
+        /* Pour les très petits écrans */
+        @media (max-width: 400px) {
+            .message {
+                max-width: 90%;
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            
+            .bot-icon {
+                left: -35px;
+                width: 25px;
+                height: 25px;
+            }
+            
+            .chat-messages {
+                padding: 10px;
+            }
+            
+            #user-input {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Pour les paysages mobiles */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .chat-container {
+                height: 100vh;
+            }
+            
+            .chat-header {
+                padding: 8px 12px;
+            }
+            
+            .chat-header img {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .message {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .chat-input {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="hinata-sexy-bot.jpeg" alt="Hinata Icon">
+            <h2>Hinata-Sexy-Bot</h2>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Écrivez votre message..." autocomplete="off">
+            <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            
+            // Initial bot introduction
+            setTimeout(() => {
+                addBotMessage("Bonjour ! Je suis Hinata-Sexy-Bot, la création intelligente de Sasaki et KingJr7. Je suis ici pour répondre à vos questions avec réflexion et précision. Comment puis-je vous aider aujourd'hui ?");
+            }, 1000);
+
+            function addBotMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'bot-icon';
+                iconDiv.innerHTML = '<img src="hinata-sexy-bot.jpeg" alt="Hinata">';
+                
+                const textDiv = document.createElement('div');
+                textDiv.textContent = text;
+                
+                messageDiv.appendChild(iconDiv);
+                messageDiv.appendChild(textDiv);
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function addUserMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user-message';
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function showTyping() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'typing-indicator';
+                typingDiv.id = 'typing-indicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'typing-dot';
+                    typingDiv.appendChild(dot);
+                }
+                
+                chatMessages.appendChild(typingDiv);
+                scrollToBottom();
+            }
+
+            function hideTyping() {
+                const typing = document.getElementById('typing-indicator');
+                if (typing) typing.remove();
+            }
+
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                // Petit délai pour s'assurer que le scroll fonctionne après l'ajout du DOM
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 50);
+            }
+
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                addUserMessage(message);
+                userInput.value = '';
+                
+                showTyping();
+                
+                try {
+                    // Envoyer au backend Python
+                    const response = await fetch('http://localhost:5000/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message })
+                    });
+                    
+                    const data = await response.json();
+                    hideTyping();
+                    addBotMessage(data.response);
+                } catch (error) {
+                    hideTyping();
+                    addBotMessage("Désolé, je rencontre des difficultés techniques. Veuillez réessayer plus tard.");
+                    console.error('Error:', error);
+                }
+                
+                // Focus sur l'input après envoi
+                userInput.focus();
+            }
+
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            // Focus automatique sur l'input au chargement
+            userInput.focus();
+            
+            // Gestion du clavier virtuel mobile
+            window.addEventListener('resize', function() {
+                scrollToBottom();
+            });
+        });
+    </script>
+</body>
+</html>
