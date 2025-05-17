@@ -41,12 +41,12 @@ class HinataBot:
             key = message.split()[0]
             return self.responses["questions"].get(key, "Question intéressante. Je dois y réfléchir.")
         
-        # Logique avancée de réponse
+    
         return self.generate_advanced_response(message)
 
     def generate_advanced_response(self, message):
         """Génère une réponse sophistiquée"""
-        self.think()  # Simulation de réflexion
+        self.think() 
         
         responses = [
             f"Après analyse, je considère que {message} est un sujet complexe qui mérite une discussion approfondie.",
